@@ -1,0 +1,68 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import random
+
+n = 10 #broj dana
+a = 100 #broj agenata
+
+zeros_array = np.zeros((a,a))
+array1 = np.zeros(a)
+array2 = np.zeros(a)
+array2[0] = 1
+array1[0] = 1
+
+for i in range(0,a):
+    for j in range(i+1,a):
+        if i == j:
+            zeros_array[i][j] = 0
+        else:
+            b = random.randint(0,100)
+            if b <= 90:
+                zeros_array[i][j] = 0
+            else:
+                zeros_array[i][j] = 1
+
+array_sus = np.zeros(n)
+array_inf = np.zeros(n)
+array_rec = np.zeros(n)
+
+for x in range (0, n):
+    for i in range(0,a):
+        for j in range(0,a):
+            if zeros_array[i][j] == 1:
+                c = random.randint(0,100)
+                if array1[i] == 1:
+                    if array1[j] == 0:
+                        if c <= 90:
+                            array1[j] = 0
+                        else:
+                            array1[j] = 1
+                            array2[j] = x + 1
+                if array1[i] == 0:
+                    if array1[j] == 1:
+                        if c <= 90:
+                            array1[i] = 0
+                        else:
+                            array1[i] = 1    
+                            array2[i] = x + 1
+            if x == array2[i] + 3:
+                array1[i] = 2
+    inf = np.count_nonzero(array1 == 1)
+    rec = np.count_nonzero(array1 == 2)
+    sus = a - (inf + rec)
+    array_sus[x] = sus
+    array_inf[x] = inf
+    array_rec[x] = rec
+    print(inf,rec,sus)
+
+array_n = np.arange(1,n+1)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(array_n, array_sus, 'b', alpha=0.5, lw=2, label='Susceptible')
+ax.plot(array_n, array_inf, 'r', alpha=0.5, lw=2, label='Infected')
+ax.plot(array_n, array_rec, 'g', alpha=0.5, lw=2, label='Recovered')
+ax.set_xlabel('Time (days)')
+ax.set_ylabel('Number of agents')
+legend = ax.legend()
+plt.show()
